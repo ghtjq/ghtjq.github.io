@@ -9,21 +9,24 @@
         
         /* 공룡 게임 버튼 스타일 */
         .game-link-btn {
-            display: inline-block;
-            margin-top: 30px;
-            padding: 15px 30px;
-            font-size: 20px;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+
+            padding: 15px 25px;
+            font-size: 16px;
             font-weight: bold;
             text-decoration: none;
             background-color: #4CAF50;
             color: white;
             border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); /* 그림자를 진하게 해서 띄워진 느낌 강조 */
             transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 999;
         }
         .game-link-btn:hover {
             background-color: #45a049;
-            transform: scale(1.1);
+            transform: translateY(-5px);
         }
     </style>
 </head>
@@ -40,7 +43,7 @@
     </div>
 
     <div style="margin-top: 40px;">
-        <a href="dino.html" class="game-link-btn">🦖 픽셀 공룡 게임 시작하기</a>
+        <a href="dino.html" class="game-link-btn">🦖 공룡 게임</a>
     </div>
 
     <script>
