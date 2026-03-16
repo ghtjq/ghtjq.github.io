@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Pixel Dino Run - Final</title>
+    <style>
+        body { 
+            margin: 0; padding: 0; overflow: hidden; 
+            display: flex; flex-direction: column; align-items: center; 
+            background-color: #222; color: white; font-family: 'Courier New', Courier, monospace;
+            user-select: none; /* 텍스트 선택 방지 */
+        }
+        h1 { margin: 10px 0; color: #4CAF50; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        canvas { 
+            background-color: #f7f7f7; 
+            border: 4px solid #4CAF50; 
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            cursor: pointer;
+            display: block;
+        }
+        .controls { margin-top: 10px; font-size: 1.2rem; color: #ccc; }
+        #restartBtn {
+            display: none; /* 평소에는 숨김 */
+            margin-top: 15px; padding: 10px 20px;
+            font-size: 1.2rem; background-color: #4CAF50; color: white;
+            border: none; border-radius: 5px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🦖 PIXEL DINO RUN</h1>
+    <canvas id="gameCanvas"></canvas>
+    <div class="controls">스페이스바 / 클릭 / 터치로 점프!</div>
+    <button id="restartBtn" onclick="resetGame()">다시 시작</button>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const restartBtn = document.getElementById('restartBtn');
+
+        // 화면 크기 설정 (큼직하게)
+        canvas.width = 1000;
+        canvas.height = 400;
+
+        // --- 이미지 로딩 ---
+        const imgDino = new Image(); imgDino.src = 'dino.png';
+        const imgC1 = new Image(); imgC1.src = 'c1.png';
+        const imgC2 = new Image(); imgC2.src = 'c2.png';
+        const imgC3 = new Image(); imgC3.src = 'c3.png';
+        const obstacleImages = [imgC1, imgC2, imgC3];
+
+        // --- 게임 변수 ---
+        let score = 0;
+        let timer = 0;
+        let obstacles = [];
+        let gameSpeed = 9;
+        let isGameOver = false;
+        let isGameStarted = false;
+
+        // --- 공룡 객체 (플레이어) ---
+        const dino = {
+            x: 100,
+            y: 250, // 초기 y 위치 (바닥)
+            width: 100, // 이미지 크기 큼직하게
+            height: 100,
+            dy: 0,
+            jumpPower: 22, // 점프 힘 (시원하게)
+            gravity: 1.1,  // 중력 (확실하게)
+            grounded: false,
+
+            draw() {
+                // 이미지가 로드되지 않았을 때를 대비해 사각형이라도 그림 (디버깅용)
+                if (!imgDino.complete) {
+                    ctx.fillStyle = "green";
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+                ctx.drawImage(imgDino, this.x, this.y, this.width, this.height);
+            },
+            update() {
+                // 물리 법칙 적용
+                this.y += this.dy;
+
+                if (this.y + this.height < canvas.height - 10) { // 바닥에서 10px 위에 서있게 함
+                    this.dy += this.gravity;
+                    this.grounded = false;
+                } else {
+                    this.dy = 0;
+                    this.grounded = true;
+                    this.y = canvas.height - this.height - 10;
+                }
+                this.draw();
+            }
+        };
+
+        // --- 장애물 클래스 (악어) ---
+        class Obstacle {
+            constructor() {
+                // 3가지 이미지 중 랜덤 선택
+                this.img = obstacleImages[Math.floor(Math.random() * obstacleImages.length)];
+                this.width = 80; // 장애물 크기
+                this.height = 80;
+                this.x = canvas.width;
+                // 공룡과 같은 바닥 높이에 생성
+                this.y = canvas.height - this.height - 10;
+            }
+            draw() {
+                if (!this.img.complete) {
+                    ctx.fillStyle = "red";
+                    ctx.fillRect(this.x, this.y, this.width, this.height);
+                }
+                ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+            }
+            update() {
+                this.x -= gameSpeed;
+                this.draw();
+            }
+        }
+
+        // --- 핵심 로직 ---
+
+        // 점프 함수
+        function handleJump() {
+            if (!isGameStarted) {
+                isGameStarted = true;
+                animate(); // 첫 클릭 시 게임 시작
+                return;
+            }
+            if (dino.grounded && !isGameOver) {
+                dino.dy = -dino.jumpPower;
+            }
+        }
+
+        // 충돌 판정 (정밀하게 조정)
+        function checkCollision(d, o) {
+            // 히트박스를 이미지보다 약간 작게 설정해서 불합리함 방지 (각각 15px씩 여유)
+            return d.x + 15 < o.x + o.width - 15 &&
+                   d.x + d.width - 15 > o.x + 15 &&
+                   d.y + 15 < o.y + o.height - 15 &&
+                   d.y + d.height - 15 > o.y + 15;
+        }
+
+        // 게임 초기화
+        function resetGame() {
+            score = 0;
+            timer = 0;
+            obstacles = [];
+            gameSpeed = 6;
+            isGameOver = false;
+            dino.y = 250;
+            dino.dy = 0;
+            restartBtn.style.display = "none";
+            animate();
+        }
+
+        // 게임 오버 화면 그리기
+        function drawGameOver() {
+            ctx.fillStyle = "rgba(0,0,0,0.7)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.font = "bold 60px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
+            ctx.font = "bold 30px Arial";
+            ctx.fillText(`최종 점수: ${Math.floor(score)}`, canvas.width/2, canvas.height/2 + 50);
+            restartBtn.style.display = "block"; // 다시 시작 버튼 표시
+        }
+
+        // 메인 애니메이션 루프
+        function animate() {
+            if (isGameOver || !isGameStarted) return;
+
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 배경 배경색 채우기
+            ctx.fillStyle = "#f7f7f7";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 바닥 선 그리기
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 10);
+            ctx.lineTo(canvas.width, canvas.height - 10);
+            ctx.strokeStyle = "#555";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            timer++;
+            score += 0.1; // 점수 천천히 상승
+            dino.update();
+
+            // 장애물 생성 (시간이 지날수록 빈도 증가)
+            let spawnRate = Math.max(50, 100 - Math.floor(score / 50)); 
+            if (timer % spawnRate === 0) {
+                obstacles.push(new Obstacle());
+                timer = 0; // 타이머 초기화해서 다음 생성 간격 확보
+            }
+
+            // 장애물 업데이트 및 충돌 체크
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].update();
+                
+                if (checkCollision(dino, obstacles[i])) {
+                    isGameOver = true;
+                    drawGameOver();
+                    return; // 루프 즉시 종료
+                }
+
+                // 화면 밖으로 나간 장애물 제거
+                if (obstacles[i].x + obstacles[i].width < 0) {
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            // 점수 표시
+            ctx.fillStyle = "#333";
+            ctx.font = "bold 25px Courier New";
+            ctx.textAlign = "left";
+            ctx.fillText(`SCORE: ${Math.floor(score)}`, 20, 40);
+        }
+
+        // --- 입력 이벤트 등록 ---
+        window.addEventListener('keydown', (e) => { 
+            if(e.code === 'Space') {
+                e.preventDefault(); // 스페이스바 화면 스크롤 방지
+                handleJump(); 
+            }
+        });
+        canvas.addEventListener('mousedown', handleJump);
+        canvas.addEventListener('touchstart', handleJump); // 모바일 지원
+
+        // --- 초기 화면 그리기 ---
+        function drawStartScreen() {
+            ctx.fillStyle = "#f7f7f7";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            dino.draw(); // 공룡 보여주기
+            
+            // 바닥 선
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 10);
+            ctx.lineTo(canvas.width, canvas.height - 10);
+            ctx.strokeStyle = "#555";
+            ctx.stroke();
+
+            ctx.fillStyle = "#333";
+            ctx.font = "bold 40px Arial";
+            ctx.textAlign = "center";
+            ctx.fillText("클릭하여 시작", canvas.width/2, canvas.height/2);
+        }
+
+        // 이미지가 로드된 후 초기 화면 그리기
+        imgDino.onload = drawStartScreen;
+
+    </script>
+</body>
+</html>
