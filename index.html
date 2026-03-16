@@ -3,42 +3,58 @@
 <head>
     <title>웹사이트</title>
     <style>
-        body { text-align: center; background-color: #f0f8ff; }
+        body { text-align: center; background-color: #f0f8ff; font-family: sans-serif; }
         h1 { color: #333; }
         button { padding: 10px 20px; cursor: pointer; }
+        
+        /* 공룡 게임 버튼 스타일 */
+        .game-link-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 50px;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .game-link-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
     <h1>안녕하세요! 제 웹사이트에 오신 걸 환영합니다.</h1>
     <p>안녕하세요</p>
     <button onclick="alert('반가워요!')">인사하기</button>
-<!-- ------------------------------------------------------- -->
+
     <div style="text-align: center; margin-top: 50px;">
-    <h3>버튼을 클릭해 보세요!</h3>
-    <button id="counterBtn" onclick="updateButton()" style="padding: 20px 40px; font-size: 30px; cursor: pointer; background-color: #008CBA; color: white; border: none; border-radius: 10px; transition: 0.2s;">
-        0
-    </button>
-</div>
+        <h3>버튼을 클릭해 보세요!</h3>
+        <button id="counterBtn" onclick="updateButton()" style="padding: 20px 40px; font-size: 30px; cursor: pointer; background-color: #008CBA; color: white; border: none; border-radius: 10px; transition: 0.2s;">
+            0
+        </button>
+    </div>
 
-<script>
-    let count = 0;
+    <div style="margin-top: 40px;">
+        <a href="dino.html" class="game-link-btn">🦖 픽셀 공룡 게임 시작하기</a>
+    </div>
 
-    function updateButton() {
-        // 1. 숫자 1 증가
-        count = count + 1;
-        
-        // 2. 버튼 요소(id="counterBtn")를 가져와서 글자를 바꿉니다
-        const btn = document.getElementById("counterBtn");
-        btn.innerText = count;
-
-        // 3. (보너스) 숫자가 커질 때마다 버튼 색을 조금씩 바꿔볼까요?
-        if (count % 10 == 0) {
-            btn.style.backgroundColor = "red"; // 10번 누를 때마다 빨간색으로!
-        } else {
-            btn.style.backgroundColor = "#008CBA";
+    <script>
+        let count = 0;
+        function updateButton() {
+            count = count + 1;
+            const btn = document.getElementById("counterBtn");
+            btn.innerText = count;
+            if (count % 10 == 0) {
+                btn.style.backgroundColor = "red";
+            } else {
+                btn.style.backgroundColor = "#008CBA";
+            }
         }
-    }
-</script>
-</script>
+    </script>
 </body>
 </html>
