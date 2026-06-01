@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투게더 보드 - 선생님 대시보드</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <a href="index.html" class="header-title">투게더 보드 👩‍🏫</a>
+        <div class="user-info">
+            <span id="teacher-name">선생님</span>
+            <button id="logout-btn" class="btn btn-small btn-secondary">로그아웃</button>
+        </div>
+    </header>
+
+    <main class="main-content dashboard-grid">
+        <!-- Left Column: Session Control & Keyword Board -->
+        <div class="board-area">
+            
+            <!-- Create Session Section -->
+            <section class="section" id="session-setup">
+                <div class="section-title">
+                    <h2>📝 새 수업 만들기</h2>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="session-topic" placeholder="예: 가장 좋아하는 동물은 무엇인가요?">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="session-template" placeholder="선택사항: 문장 템플릿 (예: 내가 가장 좋아하는 동물은 ___입니다)">
+                </div>
+                <button id="start-session-btn" class="btn btn-primary">수업 시작</button>
+            </section>
+
+            <!-- Active Session Display -->
+            <div id="active-session-info" class="session-info hidden">
+                <h2 id="display-topic" class="session-topic"></h2>
+                <p id="display-template" class="sentence-template"></p>
+                
+                <!-- Presentation Area (Blackboard & Image) -->
+                <div class="presentation-area">
+                    <canvas id="teacher-canvas" class="presentation-canvas"></canvas>
+                    <div class="presentation-controls">
+                        <input type="color" id="pen-color" class="color-picker" value="#0f172a" title="펜 색상">
+                        <button id="clear-board-btn" class="btn btn-small btn-secondary">지우기</button>
+                        <div class="file-input-wrapper">
+                            <button class="btn btn-small btn-accent">이미지 첨부</button>
+                            <input type="file" id="image-upload" accept="image/*">
+                        </div>
+                        <span style="font-size: 0.8rem; color: #64748B;">그리기가 끝나면 공유됩니다.</span>
+                    </div>
+                </div>
+
+                <button id="end-session-btn" class="btn btn-small btn-accent" style="margin-top: 1rem;">수업 종료</button>
+            </div>
+
+            <!-- Keyword Board -->
+            <section class="section">
+                <div class="section-title">
+                    <h2>📥 제출된 키워드</h2>
+                    <span class="score-badge" id="keyword-count">0 단어</span>
+                </div>
+                <div id="keyword-board" class="drop-zone">
+                    <div class="empty-state">아직 제출된 키워드가 없습니다...</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Column: Sentence Review & Leaderboard -->
+        <div class="board-area">
+            
+            <section class="section">
+                <div class="section-title">
+                    <h2>✅ 문장 확인</h2>
+                </div>
+                <div class="section-scrollable" id="sentence-review-list">
+                    <div class="empty-state">아직 제출된 문장이 없습니다...</div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-title">
+                    <h2>🏆 학생 리더보드</h2>
+                </div>
+                <div class="section-scrollable" id="leaderboard">
+                    <!-- Leaderboard items -->
+                </div>
+            </section>
+            
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <script src="store.js"></script>
+    <script src="teacher.js"></script>
+</body>
+</html>

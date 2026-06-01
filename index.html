@@ -1,63 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
-    <title>웹사이트</title>
-    <style>
-        body { text-align: center; background-color: #f0f8ff; font-family: sans-serif; }
-        h1 { color: #333; }
-        button { padding: 10px 20px; cursor: pointer; }
-        
-        /* 공룡 게임 버튼 스타일 */
-        .game-link-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-
-            padding: 15px 25px;
-            font-size: 16px;
-            font-weight: bold;
-            text-decoration: none;
-            background-color: #4CAF50;
-            color: white;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3); /* 그림자를 진하게 해서 띄워진 느낌 강조 */
-            transition: 0.3s;
-            z-index: 999;
-        }
-        .game-link-btn:hover {
-            background-color: #45a049;
-            transform: translateY(-5px);
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투게더 보드 - 로그인</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <h1>안녕하세요! 제 웹사이트에 오신 걸 환영합니다.</h1>
-    <p>안녕하세요</p>
-    <button onclick="alert('반가워요!')">인사하기</button>
-
-    <div style="text-align: center; margin-top: 50px;">
-        <h3>버튼을 클릭해 보세요!</h3>
-        <button id="counterBtn" onclick="updateButton()" style="padding: 20px 40px; font-size: 30px; cursor: pointer; background-color: #008CBA; color: white; border: none; border-radius: 10px; transition: 0.2s;">
-            0
-        </button>
+<body class="login-bg">
+    <div class="login-container card glass-effect">
+        <h1 class="logo-title">투게더 보드 🧩</h1>
+        <p class="subtitle">함께 배우고 문장을 만들어봐요!</p>
+        
+        <div class="form-group">
+            <label for="username">이름이 무엇인가요?</label>
+            <input type="text" id="username" placeholder="이름을 입력하세요" autocomplete="off">
+        </div>
+        
+        <div class="role-selector">
+            <button class="btn role-btn" data-role="student">👨‍🎓 학생입니다</button>
+            <button class="btn role-btn" data-role="teacher">👩‍🏫 선생님입니다</button>
+        </div>
     </div>
 
-    <div style="margin-top: 40px;">
-        <a href="dino.html" class="game-link-btn">🦖 공룡 게임</a>
-    </div>
-
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <script src="store.js"></script>
     <script>
-        let count = 0;
-        function updateButton() {
-            count = count + 1;
-            const btn = document.getElementById("counterBtn");
-            btn.innerText = count;
-            if (count % 10 == 0) {
-                btn.style.backgroundColor = "red";
-            } else {
-                btn.style.backgroundColor = "#008CBA";
-            }
-        }
+        document.querySelectorAll('.role-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const name = document.getElementById('username').value.trim();
+                if (!name) {
+                    alert('이름을 입력해주세요!');
+                    return;
+                }
+                const role = e.target.dataset.role;
+                
+                Store.update('users', (users) => {
+                    const u = users || {};
+                    if (!u[name]) {
+                        u[name] = { role, score: 0 };
+                    }
+                    return u;
+                }, {});
+
+                Store.set('currentUser', { name, role });
+
+                if (role === 'teacher') {
+                    window.location.href = 'teacher.html';
+                } else {
+                    window.location.href = 'student.html';
+                }
+            });
+        });
+
+        Store.set('currentUser', null);
     </script>
 </body>
 </html>

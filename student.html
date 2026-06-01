@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>투게더 보드 - 학생 화면</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <a href="index.html" class="header-title">투게더 보드 👨‍🎓</a>
+        <div class="user-info">
+            <span class="score-badge" id="student-score">0 점</span>
+            <span id="student-name">학생</span>
+            <button id="logout-btn" class="btn btn-small btn-secondary">로그아웃</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <!-- Waiting State -->
+        <div id="waiting-state" class="empty-state section">
+            <h2>선생님이 수업을 시작하기를 기다리는 중... ⏳</h2>
+        </div>
+
+        <!-- Active Session -->
+        <div id="active-session-container" class="dashboard-grid hidden">
+            <!-- Left Column: Submit Keywords & Board -->
+            <div class="board-area">
+                
+                <!-- Topic Display -->
+                <div class="session-info" style="margin-bottom: 0;">
+                    <h2 id="display-topic" class="session-topic"></h2>
+                </div>
+
+                <!-- Presentation Area (View Only) -->
+                <div class="presentation-area" style="margin-bottom: 1.5rem;" id="student-presentation-area">
+                    <canvas id="student-canvas" class="presentation-canvas" style="cursor: default; pointer-events: none;"></canvas>
+                </div>
+
+                <!-- Submit Keyword Section -->
+                <section class="section" style="padding: 1rem; flex-shrink: 0; height: auto;">
+                    <div class="section-title" style="margin-bottom: 0.5rem; padding-bottom: 0; border-bottom: none;">
+                        <h2>✍️ 키워드 제출하기</h2>
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <input type="text" id="keyword-input" placeholder="예: 강아지, 빠르다" maxlength="15">
+                        <button id="submit-keyword-btn" class="btn btn-primary">제출</button>
+                    </div>
+                </section>
+
+                <!-- Keyword Board (Draggable sources) -->
+                <section class="section" style="flex: 1;">
+                    <div class="section-title">
+                        <h2>📥 키워드 보드</h2>
+                        <span style="font-size: 0.9rem; color: #64748B;">이 단어들을 드래그해서 문장을 만들어보세요!</span>
+                    </div>
+                    <div id="keyword-board" class="drop-zone" data-zone="board">
+                        <!-- Keywords will appear here -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Column: Sentence Builder -->
+            <div class="board-area">
+                <section class="section" style="flex: 1;">
+                    <div class="section-title">
+                        <h2>🧩 문장 만들기</h2>
+                    </div>
+                    
+                    <p id="display-template" class="sentence-template"></p>
+
+                    <div id="sentence-builder-zone" class="drop-zone" data-zone="builder" style="min-height: 250px; background-color: #F8FAFC; border-color: var(--secondary);">
+                        <div class="empty-state" style="margin-top: 1rem; pointer-events: none;">여기에 단어를 놓으세요!</div>
+                    </div>
+                    <p style="text-align: center; font-size: 0.85rem; color: #94A3B8; margin-top: 0.5rem;">팁: 만든 문장에서 블록을 클릭하면 삭제할 수 있어요.</p>
+
+                    <button id="submit-sentence-btn" class="btn btn-success" style="margin-top: 1rem; width: 100%;">🚀 문장 제출하기</button>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-database-compat.js"></script>
+    <script src="store.js"></script>
+    <script src="student.js"></script>
+</body>
+</html>
